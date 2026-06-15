@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コトノハの小径 〜みやびちゃんと学ぶ古文入門〜</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind Custom Config for Pastel Japanese Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sakura: '#FFECF1', // サクラ色
+                        sakuraDark: '#FFB7C5',
+                        matcha: '#F4F7EC', // 抹茶
+                        matchaDark: '#C2D1A6',
+                        fuji: '#F3EFFF', // 藤色
+                        fujiDark: '#C1B2FF',
+                        sumi: '#333333', // 墨
+                        miyabiGold: '#F9EFA4', // 雅な金
+                        yamabuki: '#FFDE83' // 山吹色
+                    },
+                    fontFamily: {
+                        sans: ['Zen Maru Gothic', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts for Cute Japanese Rounded Gothic -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 和風の背景パターンやアニメーション */
+        .japanese-pattern {
+            background-color: #ffecf1;
+            background-image: radial-gradient(#ffb7c5 0.5px, transparent 0.5px), radial-gradient(#ffb7c5 0.5px, #ffecf1 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+        .cherry-blossom {
+            position: absolute;
+            pointer-events: none;
+            background: #ffb7c5;
+            border-radius: 150% 0 150% 150%;
+            animation: fall 6s linear infinite;
+            z-index: 50;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .bounce-custom {
+            animation: bounceCustom 2s infinite;
+        }
+        @keyframes bounceCustom {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-sakura font-sans text-sumi min-h-screen flex flex-col justify-between overflow-x-hidden relative select-none">
+
+    <!-- 桜吹雪のエフェクト背景 -->
+    <div id="sakura-container" class="absolute inset-0 overflow-hidden pointer-events-none z-10"></div>
+
+    <!-- ヘッダー -->
+    <header class="bg-white/90 backdrop-blur shadow-md sticky top-0 z-40 border-b-4 border-sakuraDark transition-all">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="showScreen('home')">
+                <div class="bg-sakuraDark w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-xl shadow-inner border border-white">
+                    雅
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-black text-pink-600 tracking-wider">コトノハの小径</h1>
+                    <p class="text-[10px] text-gray-500 font-bold">みやびちゃんと学ぶ古文入門</p>
+                </div>
+            </div>
+            
+            <!-- スコア＆庭の成長度 -->
+            <div class="flex items-center gap-3">
+                <div class="bg-matcha border-2 border-matchaDark rounded-full px-3 py-1 flex items-center gap-2 text-xs md:text-sm shadow-sm">
+                    <span class="text-green-700 font-bold"><i class="fa-solid fa-seedling mr-1"></i>お庭Lv:</span>
+                    <span id="garden-level" class="font-black text-green-800">1</span>
+                    <span class="text-[10px] bg-white px-2 py-0.5 rounded-full text-green-700 shadow-inner font-extrabold" id="garden-exp">0/100pt</span>
+                </div>
+                <button onclick="showInstructions()" class="bg-yamabuki hover:bg-yellow-400 text-yellow-900 font-bold p-2 rounded-full w-8 h-8 flex items-center justify-center shadow-md transition-transform active:scale-95" title="遊び方説明">
+                    <i class="fa-solid fa-question"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 z-20">
+        
+        <!-- 【みやびちゃん吹き出しガイドエリア】 -->
+        <div id="miyabi-advisor" class="bg-white/95 rounded-2xl p-4 shadow-lg border-2 border-pink-200 mb-6 flex flex-col md:flex-row gap-4 items-center relative transition-all">
+            <div class="relative flex-shrink-0 w-24 h-24 flex items-center justify-center">
+                <!-- みやびちゃんSVGうさぎ -->
+                <svg id="miyabi-svg" class="w-full h-full drop-shadow" viewBox="0 0 100 100">
+                    <!-- 耳 -->
+                    <path d="M 30 15 C 20 5, 25 35, 35 40 C 37 42, 33 25, 30 15" fill="#FFF" stroke="#FFB7C5" stroke-width="2"/>
+                    <path d="M 32 18 C 24 10, 28 30, 35 35" fill="#FFECF1" />
+                    
+                    <path d="M 70 15 C 80 5, 75 35, 65 40 C 63 42, 67 25, 70 15" fill="#FFF" stroke="#FFB7C5" stroke-width="2"/>
+                    <path d="M 68 18 C 76 10, 72 30, 65 35" fill="#FFECF1" />
+                    <!-- 体 -->
+                    <circle cx="50" cy="75" r="22" fill="#E8F4F8" stroke="#B0D5E6" stroke-width="2" />
+                    <!-- 和柄着物風の模様 -->
+                    <circle cx="50" cy="78" r="14" fill="#FFDE83" />
+                    <path d="M 45 78 L 55 78 M 50 73 L 50 83" stroke="#FFF" stroke-width="1.5" />
+                    <!-- 頭 -->
+                    <circle cx="50" cy="48" r="23" fill="#FFF" stroke="#FFB7C5" stroke-width="2"/>
+                    <!-- ほっぺ -->
+                    <circle cx="36" cy="54" r="4" fill="#FFB7C5" opacity="0.6"/>
+                    <circle cx="64" cy="54" r="4" fill="#FFB7C5" opacity="0.6"/>
+                    <!-- 目 -->
+                    <circle id="miyabi-eye-l" cx="42" cy="48" r="2.5" fill="#333"/>
+                    <circle id="miyabi-eye-r" cx="58" cy="48" r="2.5" fill="#333"/>
+                    <!-- 鼻と口 -->
+                    <path d="M 48 53 Q 50 55 52 53" fill="none" stroke="#FFB7C5" stroke-width="2" stroke-linecap="round"/>
+                    <!-- てまり(手) -->
+                    <circle cx="50" cy="74" r="6" fill="#FFB7C5" stroke="#FFF" stroke-width="1" />
+                </svg>
+                <!-- 小さな飾りの花 -->
+                <i class="fa-solid fa-fan text-pink-300 absolute -top-1 -right-1 animate-spin" style="animation-duration: 10s;"></i>
+            </div>
+            <div class="flex-grow w-full text-center md:text-left">
+                <span class="inline-block bg-pink-100 text-pink-600 font-extrabold text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full mb-1">みやびちゃんの助言</span>
+                <p id="miyabi-bubble" class="text-sm md:text-base font-bold text-gray-700 leading-relaxed">
+                    おじゃりやれ！古典の世界へようこそでおじゃる。まずは好きな道（ステージ）を選んで進むがよいぞ！
+                </p>
+            </div>
+            <!-- 小桜の装飾 -->
+            <div class="absolute -bottom-2 -left-2 text-pink-400 text-lg opacity-80"><i class="fa-solid fa-snowflake"></i></div>
+            <div class="absolute -top-2 -right-2 text-pink-400 text-lg opacity-80"><i class="fa-solid fa-snowflake"></i></div>
+        </div>
+
+        <!-- ==================== SCREEN 1: HOME ==================== -->
+        <div id="screen-home" class="screen-view flex flex-col gap-6">
+            <!-- 雅なお庭（レベルアップでだんだん賑やかになる） -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border-2 border-matchaDark relative overflow-hidden h-44 md:h-52 flex flex-col justify-between">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-matcha rounded-full opacity-50 z-0"></div>
+                <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-pink-50 rounded-full opacity-60 z-0"></div>
+                
+                <div class="z-10 flex justify-between items-start w-full">
+                    <div>
+                        <span class="bg-green-100 text-green-800 border border-green-200 text-xs font-black px-3 py-1 rounded-full shadow-sm"><i class="fa-solid fa-campground mr-1.5"></i>あなたのみやびな庵とお庭</span>
+                        <h3 class="text-lg md:text-xl font-extrabold text-green-900 mt-2">コトノハが芽吹く庵</h3>
+                    </div>
+                    <span id="garden-status-text" class="text-xs bg-white border border-green-300 font-bold text-green-700 px-2.5 py-1 rounded-full shadow-sm">桜が少し咲いているぞ！</span>
+                </div>
+
+                <!-- お庭グラフィック：和風のイラスト素材 -->
+                <div class="z-10 flex justify-around items-end w-full h-24 relative overflow-hidden" id="garden-illustration">
+                    <!-- 土台の芝生 -->
+                    <div class="absolute bottom-0 left-0 w-full h-4 bg-green-200 rounded-full"></div>
+                    <!-- 庵 -->
+                    <div class="flex flex-col items-center z-10 transition-transform hover:scale-105 duration-300 cursor-pointer" onclick="miyabiSay('これはあなたと麻呂が古文を学ぶ庵でおじゃる。学びを深めるとお庭がだんだん賑やかになるぞ！')">
+                        <span class="text-4xl">🛖</span>
+                        <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded border border-amber-200">庵</span>
+                    </div>
+                    <!-- 桜の木（成長段階1~4） -->
+                    <div id="garden-tree" class="flex flex-col items-center z-10">
+                        <span id="tree-emoji" class="text-5xl bounce-custom">🌸</span>
+                        <span class="text-[10px] bg-pink-100 text-pink-700 font-bold px-1.5 py-0.2 rounded border border-pink-200 mt-1">言の葉の桜</span>
+                    </div>
+                    <!-- 蛍（レベルアップで出現） -->
+                    <div id="garden-firefly" class="flex-col items-center z-10 hidden">
+                        <span class="text-3xl animate-pulse">✨</span>
+                        <span class="text-[10px] bg-blue-50 text-blue-700 font-bold px-1.5 py-0.2 rounded border border-blue-200">蛍の夜</span>
+                    </div>
+                    <!-- 舟（源氏・方丈の河、レベルアップで出現） -->
+                    <div id="garden-boat" class="flex-col items-center z-10 hidden">
+                        <span class="text-4xl">🛶</span>
+                        <span class="text-[10px] bg-cyan-100 text-cyan-800 font-bold px-1.5 py-0.2 rounded border border-cyan-200">行く河</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステージ選択グリッド -->
+            <h2 class="text-xl font-black text-pink-700 flex items-center gap-2"><i class="fa-solid fa-map-location-dot"></i> 学ぶ道（ステージ）を選ぶでおじゃる！</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- ステージ1：仮名遣い -->
+                <div onclick="showScreen('kanazukai')" class="bg-white hover:bg-pink-50/50 rounded-3xl p-5 shadow-md hover:shadow-xl border-2 border-pink-100 hover:border-pink-300 cursor-pointer transition-all flex items-start gap-4 transform hover:-translate-y-1">
+                    <div class="bg-pink-100 text-pink-600 p-4 rounded-2xl text-2xl flex-shrink-0">
+                        <i class="fa-solid fa-pen-nib"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-pink-200 text-pink-800 text-[10px] font-black px-2 py-0.5 rounded">其の一</span>
+                            <span class="text-[10px] text-gray-500 font-extrabold">歴史的仮名遣い</span>
+                        </div>
+                        <h4 class="text-base font-black text-gray-800 mt-1">ひらがな変換！てまり唄</h4>
+                        <p class="text-xs text-gray-500 font-bold mt-1.5">「いふ」や「うつくしう」などの昔の書き表し方を、現代風の読み方に直す練習でおじゃる！</p>
+                    </div>
+                </div>
+
+                <!-- ステージ2：冒頭リズム -->
+                <div onclick="showScreen('rhythm')" class="bg-white hover:bg-amber-50/50 rounded-3xl p-5 shadow-md hover:shadow-xl border-2 border-amber-100 hover:border-amber-300 cursor-pointer transition-all flex items-start gap-4 transform hover:-translate-y-1">
+                    <div class="bg-amber-100 text-amber-600 p-4 rounded-2xl text-2xl flex-shrink-0">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-200 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded">其の二</span>
+                            <span class="text-[10px] text-gray-500 font-extrabold">音読と暗唱</span>
+                        </div>
+                        <h4 class="text-base font-black text-gray-800 mt-1">言の葉のパズル（冒頭選）</h4>
+                        <p class="text-xs text-gray-500 font-bold mt-1.5">『竹取物語』『枕草子』などの美しい冒頭フレーズを完成させて、古文のリズムを体感するぞ！</p>
+                    </div>
+                </div>
+
+                <!-- ステージ3：文法 -->
+                <div onclick="showScreen('grammar')" class="bg-white hover:bg-violet-50/50 rounded-3xl p-5 shadow-md hover:shadow-xl border-2 border-violet-100 hover:border-violet-300 cursor-pointer transition-all flex items-start gap-4 transform hover:-translate-y-1">
+                    <div class="bg-violet-100 text-violet-600 p-4 rounded-2xl text-2xl flex-shrink-0">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-violet-200 text-violet-800 text-[10px] font-black px-2 py-0.5 rounded">其の三</span>
+                            <span class="text-[10px] text-gray-500 font-extrabold">用言・係り結び・接続</span>
+                        </div>
+                        <h4 class="text-base font-black text-gray-800 mt-1">結びの桜 ＆ 条件の鍵</h4>
+                        <p class="text-xs text-gray-500 font-bold mt-1.5">係り結びの法則や、「未然形＋ば（もし〜なら）」と「已然形＋ば（〜なので）」の仕分けパズルでおじゃる！</p>
+                    </div>
+                </div>
+
+                <!-- ステージ4：おはなし（絵巻・説話） -->
+                <div onclick="showScreen('story')" class="bg-white hover:bg-emerald-50/50 rounded-3xl p-5 shadow-md hover:shadow-xl border-2 border-emerald-100 hover:border-emerald-300 cursor-pointer transition-all flex items-start gap-4 transform hover:-translate-y-1">
+                    <div class="bg-emerald-100 text-emerald-600 p-4 rounded-2xl text-2xl flex-shrink-0">
+                        <i class="fa-solid fa-scroll"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-emerald-200 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded">其の四</span>
+                            <span class="text-[10px] text-gray-500 font-extrabold">伴大納言絵巻＆説話</span>
+                        </div>
+                        <h4 class="text-base font-black text-gray-800 mt-1">平安タイムライン（噂話と説話）</h4>
+                        <p class="text-xs text-gray-500 font-bold mt-1.5">『児のそら寝』や『絵仏師良秀』のエピソード、昔の「拡散力」と現代とのつながりをSNS風に紹介！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SCREEN 2: KANAZUKAI (歴史的仮名遣い) ==================== -->
+        <div id="screen-kanazukai" class="screen-view hidden flex flex-col gap-6">
+            <div class="flex justify-between items-center bg-white rounded-2xl p-4 border-b-4 border-pink-300 shadow">
+                <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> 戻る
+                </button>
+                <span class="bg-pink-100 text-pink-700 font-black text-sm px-4 py-1 rounded-full"><i class="fa-solid fa-pen-nib mr-1"></i>ひらがな変換！てまり唄</span>
+                <div class="text-xs font-bold text-gray-500">
+                    問題 <span id="kana-q-index" class="text-pink-600 font-black">1</span> / <span id="kana-q-total">6</span>
+                </div>
+            </div>
+
+            <!-- クイズエリア -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-2 border-pink-100 relative min-h-[300px] flex flex-col justify-between">
+                <!-- 出典やヒント -->
+                <div class="flex justify-between items-start">
+                    <span id="kana-source" class="bg-yellow-100 text-yellow-800 text-[10px] font-black px-3 py-1 rounded-full border border-yellow-200">竹取物語</span>
+                    <button onclick="triggerKanaHint()" class="text-xs font-bold text-pink-600 hover:text-pink-700 bg-pink-50 px-2.5 py-1 rounded-lg border border-pink-200 transition-colors">
+                        <i class="fa-regular fa-lightbulb mr-1"></i>みやびヒント
+                    </button>
+                </div>
+
+                <!-- 古文（お題） -->
+                <div class="text-center my-6">
+                    <p class="text-xs font-extrabold text-gray-400">歴史的仮名遣いでの表記</p>
+                    <p id="kana-question" class="text-3xl md:text-4xl font-black text-gray-800 tracking-wider mt-2 bg-pink-50/50 inline-block px-6 py-3 rounded-2xl border border-dashed border-pink-300">
+                        いふ
+                    </p>
+                    <p id="kana-sentence" class="text-xs md:text-sm font-bold text-gray-500 mt-4 max-w-md mx-auto leading-relaxed bg-gray-50 p-2.5 rounded-xl">
+                        「～といふものありけり」
+                    </p>
+                </div>
+
+                <!-- 選択肢エリア -->
+                <div id="kana-options" class="grid grid-cols-2 gap-4">
+                    <!-- JavaScriptでボタンを動的に追加 -->
+                </div>
+            </div>
+
+            <!-- 補足・解説モーダル的なエリア（正解・不正解後に出現） -->
+            <div id="kana-feedback-box" class="bg-white rounded-2xl p-5 shadow-lg border-2 border-green-200 hidden transition-all">
+                <div class="flex items-center gap-3 mb-2">
+                    <span id="kana-status-icon" class="text-2xl"></span>
+                    <h5 id="kana-feedback-title" class="font-black text-lg">正解でおじゃる！</h5>
+                </div>
+                <p id="kana-explanation" class="text-xs md:text-sm font-bold text-gray-600 leading-relaxed">
+                    解説が入ります。
+                </p>
+                <div class="mt-4 flex justify-end">
+                    <button id="kana-next-btn" onclick="nextKanaQuestion()" class="bg-pink-500 hover:bg-pink-600 text-white font-black px-6 py-2 rounded-xl text-xs tracking-wider shadow transition-transform active:scale-95">
+                        次の問題へ進む <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SCREEN 3: RHYTHM (言の葉パズル・冒頭選) ==================== -->
+        <div id="screen-rhythm" class="screen-view hidden flex flex-col gap-6">
+            <div class="flex justify-between items-center bg-white rounded-2xl p-4 border-b-4 border-amber-300 shadow">
+                <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> 戻る
+                </button>
+                <span class="bg-amber-100 text-amber-700 font-black text-sm px-4 py-1 rounded-full"><i class="fa-solid fa-music mr-1"></i>言の葉のパズル</span>
+                <div class="text-xs font-bold text-gray-500">
+                    作品選択
+                </div>
+            </div>
+
+            <!-- 作品選択用のタブ/リスト -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-100 flex flex-wrap gap-2 justify-center">
+                <button onclick="selectRhythmWork('taketori')" id="tab-taketori" class="rhythm-tab-btn bg-amber-500 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition-all">竹取物語</button>
+                <button onclick="selectRhythmWork('makura')" id="tab-makura" class="rhythm-tab-btn bg-gray-100 text-gray-600 font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all">枕草子</button>
+                <button onclick="selectRhythmWork('heike')" id="tab-heike" class="rhythm-tab-btn bg-gray-100 text-gray-600 font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all">平家物語</button>
+                <button onclick="selectRhythmWork('tsurezure')" id="tab-tsurezure" class="rhythm-tab-btn bg-gray-100 text-gray-600 font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all">徒然草</button>
+                <button onclick="selectRhythmWork('okuno')" id="tab-okuno" class="rhythm-tab-btn bg-gray-100 text-gray-600 font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all">奥の細道</button>
+            </div>
+
+            <!-- パズルボード -->
+            <div class="bg-white rounded-3xl p-6 shadow-md border-2 border-amber-100 relative min-h-[350px] flex flex-col justify-between gap-6">
+                <div>
+                    <h5 id="rhythm-title" class="text-lg font-black text-amber-900 border-b pb-2 mb-4">『竹取物語』冒頭を完成させよう！</h5>
+                    <p class="text-xs font-bold text-gray-400 mb-3"><i class="fa-solid fa-circle-info mr-1"></i>カードをクリック・タップして正しい並び順にしてください。</p>
+                </div>
+
+                <!-- 組み立てエリア（ここが正しい並びになるようにする） -->
+                <div class="bg-amber-50/50 rounded-2xl p-4 border-2 border-dashed border-amber-300 min-h-[100px] flex flex-wrap gap-2.5 items-center justify-center content-center" id="rhythm-assembled">
+                    <!-- ここにユーザーが選択した言葉が並ぶ -->
+                </div>
+
+                <!-- 手元の言葉カードエリア -->
+                <div class="flex flex-wrap gap-2.5 items-center justify-center border-t pt-4" id="rhythm-hand">
+                    <!-- ここにバラバラの言葉カードが並ぶ -->
+                </div>
+
+                <!-- 操作ボタン -->
+                <div class="flex justify-between items-center mt-4">
+                    <button onclick="resetRhythmPuzzle()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                        やり直す
+                    </button>
+                    <button onclick="checkRhythmAnswer()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-6 py-2.5 rounded-xl text-xs tracking-wider shadow transition-transform active:scale-95">
+                        完成！調べる <i class="fa-solid fa-circle-check ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 冒頭の完全な解説と現代語訳カード（クリア時に豪華に出現） -->
+            <div id="rhythm-success-box" class="bg-white rounded-3xl p-6 shadow-lg border-2 border-green-300 hidden transition-all flex flex-col gap-4">
+                <div class="flex items-center gap-3 border-b-2 border-green-200 pb-3">
+                    <span class="text-3xl">🌸</span>
+                    <div>
+                        <h4 class="text-lg font-black text-green-900">見事完成！美しく詠めました！</h4>
+                        <p id="rhythm-roman" class="text-xs font-extrabold text-green-700">Taketori Monogatari</p>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-full mb-1">現代語訳</span>
+                    <p id="rhythm-translation" class="text-sm font-bold text-gray-700 leading-relaxed bg-amber-50/50 p-3 rounded-xl border border-amber-100">
+                        今は昔、竹取の翁という者がいた。野山に入り混じって竹を取っては、様々なこと（細工）に使い、生活をしていた...
+                    </p>
+                </div>
+
+                <div>
+                    <span class="inline-block bg-green-100 text-green-800 text-[10px] font-black px-2.5 py-0.5 rounded-full mb-1">みやびの知識コラム</span>
+                    <p id="rhythm-column" class="text-xs md:text-sm font-bold text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        「今は昔」は説話・物語の代表的な書き出しでおじゃる。リズムの基本は、七五調・五七調の音数になっていることが多く、読んでいるだけで心地よくなるようになっておるのだぞ。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SCREEN 4: GRAMMAR (文法のきまり) ==================== -->
+        <div id="screen-grammar" class="screen-view hidden flex flex-col gap-6">
+            <div class="flex justify-between items-center bg-white rounded-2xl p-4 border-b-4 border-violet-300 shadow">
+                <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> 戻る
+                </button>
+                <span class="bg-violet-100 text-violet-700 font-black text-sm px-4 py-1 rounded-full"><i class="fa-solid fa-puzzle-piece mr-1"></i>結びの桜 ＆ 条件の鍵</span>
+                <div class="text-xs font-bold text-gray-500">
+                    文法編
+                </div>
+            </div>
+
+            <!-- サブセクション選択 -->
+            <div class="grid grid-cols-2 gap-2 bg-white rounded-2xl p-2.5 shadow-sm border border-violet-100">
+                <button onclick="switchGrammarMode('kakari')" id="btn-gmode-kakari" class="bg-violet-500 text-white font-black text-xs py-2 rounded-xl shadow-inner transition-all">1. 係り結びの法則</button>
+                <button onclick="switchGrammarMode('ba')" id="btn-gmode-ba" class="bg-gray-100 text-gray-600 font-extrabold text-xs py-2 rounded-xl transition-all">2. 接続助詞「ば」の識別</button>
+            </div>
+
+            <!-- モード1：係り結びパズル -->
+            <div id="gbox-kakari" class="bg-white rounded-3xl p-6 shadow-md border-2 border-violet-100 flex flex-col gap-6">
+                <div>
+                    <h4 class="text-base font-black text-violet-900 border-b pb-2"><i class="fa-regular fa-star mr-1"></i>係助詞と文末の「結び（活用形）」を結びつけよう！</h4>
+                    <p class="text-xs font-bold text-gray-500 mt-2">係助詞が入ることで、文末が特別な活用形（連體形や已然形）に変化することを「係り結び」と言うぞ！正しいペアをクリックして結びつけるでおじゃる！</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- 係助詞（左カラム） -->
+                    <div class="flex flex-col gap-2.5" id="kakari-left-col">
+                        <span class="text-center font-black text-xs text-violet-700 bg-violet-50 py-1.5 rounded-lg border border-violet-200">係助詞（キッカケ）</span>
+                        <!-- 動的生成 -->
+                    </div>
+                    <!-- 結びの活用形（右カラム） -->
+                    <div class="flex flex-col gap-2.5" id="kakari-right-col">
+                        <span class="text-center font-black text-xs text-violet-700 bg-violet-50 py-1.5 rounded-lg border border-violet-200">結び（活用形）</span>
+                        <!-- 動的生成 -->
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100 mt-2">
+                    <p id="kakari-match-status" class="text-xs font-extrabold text-violet-700">ペアを2つ選ぶと自動でマッチング判定が走るぞ！</p>
+                    <button onclick="resetKakari()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-3.5 py-1.5 rounded-xl text-xs transition-all">リセット</button>
+                </div>
+            </div>
+
+            <!-- モード2：「ば」の仕分けパズル -->
+            <div id="gbox-ba" class="bg-white rounded-3xl p-6 shadow-md border-2 border-violet-100 hidden flex flex-col gap-6">
+                <div>
+                    <h4 class="text-base font-black text-violet-900 border-b pb-2"><i class="fa-solid fa-arrows-split-up-and-left mr-1"></i>「ば」の条件分岐仕分け！</h4>
+                    <p class="text-xs font-bold text-gray-500 mt-2">古文の「～ば」は、上が【未然形】か【已然形】かで意味が180度変わるぞ！表示されるフレーズを正しい「かご」にタップして仕分けよう！</p>
+                </div>
+
+                <!-- 現在仕分ける対象の文章 -->
+                <div class="bg-violet-50/50 rounded-2xl p-5 border border-dashed border-violet-300 text-center my-2 relative">
+                    <span id="ba-source-badge" class="absolute -top-3.5 left-4 bg-violet-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow">児のそら寝 より</span>
+                    <p id="ba-target-phrase" class="text-2xl font-black text-gray-800 tracking-wider">
+                        書きつくれ<span class="text-red-500 underline">ば</span>
+                    </p>
+                    <p id="ba-target-kana" class="text-xs font-bold text-gray-500 mt-2">
+                        （書きつけると、書きつけたところ）
+                    </p>
+                    <div class="mt-3 bg-white inline-block px-3 py-1 rounded-full border border-violet-100 shadow-sm text-xs font-bold text-violet-800">
+                        上の言葉：<span id="ba-parent-conjugation" class="font-extrabold text-pink-600">已然形（書きつくれ）</span>
+                    </div>
+                </div>
+
+                <!-- 仕分け先かご（2つのボタン） -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- かごA：仮定条件 -->
+                    <button onclick="sortBaPhrase('katei')" class="bg-white hover:bg-emerald-50 text-emerald-800 border-4 border-dashed border-emerald-300 hover:border-emerald-500 rounded-2xl p-4 transition-all text-center flex flex-col items-center gap-1 shadow-md transform hover:-translate-y-1">
+                        <span class="text-4xl">🧺</span>
+                        <span class="font-black text-sm text-emerald-900 mt-1">仮定条件（もし〜なら）</span>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-extrabold mt-1">未然形 ＋ ば</span>
+                    </button>
+                    <!-- かごB：確定条件 -->
+                    <button onclick="sortBaPhrase('kakutei')" class="bg-white hover:bg-blue-50 text-blue-800 border-4 border-dashed border-blue-300 hover:border-blue-500 rounded-2xl p-4 transition-all text-center flex flex-col items-center gap-1 shadow-md transform hover:-translate-y-1">
+                        <span class="text-4xl">🧺</span>
+                        <span class="font-black text-sm text-blue-900 mt-1">確定条件（〜ので、〜と）</span>
+                        <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-extrabold mt-1">已然形 ＋ ば</span>
+                    </button>
+                </div>
+
+                <!-- 成績・進行度 -->
+                <div class="flex justify-between items-center text-xs font-bold text-gray-500 border-t pt-4">
+                    <span>正解数: <span id="ba-score-current" class="text-violet-600 font-black">0</span> / <span id="ba-score-total">6</span></span>
+                    <span id="ba-feedback-toast" class="text-violet-800 font-extrabold bg-violet-50 px-3 py-1 rounded-lg">正しく仕分けるのじゃ！</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SCREEN 5: STORY (伴大納言絵巻＆説話) ==================== -->
+        <div id="screen-story" class="screen-view hidden flex flex-col gap-6">
+            <div class="flex justify-between items-center bg-white rounded-2xl p-4 border-b-4 border-emerald-300 shadow">
+                <button onclick="showScreen('home')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> 戻る
+                </button>
+                <span class="bg-emerald-100 text-emerald-700 font-black text-sm px-4 py-1 rounded-full"><i class="fa-solid fa-scroll mr-1"></i>平安タイムライン</span>
+                <div class="text-xs font-bold text-gray-500">
+                    説話と絵巻
+                </div>
+            </div>
+
+            <!-- ストーリー切り替えタブ -->
+            <div class="grid grid-cols-2 gap-2 bg-white rounded-2xl p-2.5 shadow-sm border border-emerald-100">
+                <button onclick="switchStoryTab('chigo')" id="btn-story-chigo" class="bg-emerald-500 text-white font-black text-xs py-2 rounded-xl shadow-inner transition-all">児のそら寝</button>
+                <button onclick="switchStoryTab('yoshihide')" id="btn-story-yoshihide" class="bg-gray-100 text-gray-600 font-extrabold text-xs py-2 rounded-xl transition-all">絵仏師良秀＆伴大納言</button>
+            </div>
+
+            <!-- 児のそら寝エリア -->
+            <div id="story-chigo-box" class="flex flex-col gap-4">
+                <!-- あらすじ解説 -->
+                <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-emerald-100">
+                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-face-smile mr-1"></i>宇治拾遺物語：児のそら寝</span>
+                    <h4 class="text-lg font-black text-gray-800 mt-3">お菓子を食べたい児の可愛い「そら寝」</h4>
+                    <p class="text-xs text-gray-500 mt-2 leading-relaxed">
+                        比叡山の僧たちがお餅を焼くのを楽しみに待っている「児（ちご）」。しかし、すぐに飛びついては食いしん坊だと思われるので、一旦「寝たふり（そら寝）」をすることにします。僧たちの「もしもし、お起きなさい」という呼びかけを待ちますが、途中で別の僧が「もう寝ていらっしゃる、そっとしておこう」と言ってしまいます。これに焦った児は...
+                    </p>
+                </div>
+
+                <!-- 昔のSNSタイムライン風表示（伴大納言絵巻の「噂の拡散」にインスパイア） -->
+                <h5 class="text-sm font-black text-emerald-800 flex items-center gap-1.5"><i class="fa-solid fa-comments"></i> 平安京の掲示板（もし平安時代にスマホがあったら？）</h5>
+                
+                <div class="flex flex-col gap-3">
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex gap-3 transition-transform hover:scale-[1.01]">
+                        <div class="text-2xl bg-amber-100 p-2 rounded-full w-10 h-10 flex items-center justify-center">僧</div>
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-xs text-gray-800">比叡山の餅焼き僧</span>
+                                <span class="text-[10px] text-gray-400">平安時8:30</span>
+                            </div>
+                            <p class="text-xs font-bold text-gray-600 mt-1">「今夜、お餅焼くから準備しといて！みんなを呼んでお菓子パーティーじゃ！🍡✨」</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex gap-3 transition-transform hover:scale-[1.01]">
+                        <div class="text-2xl bg-pink-100 p-2 rounded-full w-10 h-10 flex items-center justify-center">児</div>
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-xs text-pink-600">そら寝中の児</span>
+                                <span class="text-[10px] text-gray-400">平安時8:45</span>
+                            </div>
+                            <p class="text-xs font-bold text-gray-600 mt-1">「（おいしそう…でもすぐ起きると食いしん坊って思われるから寝たふりしよ…ふにゃ…😴💤）」</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex gap-3 transition-transform hover:scale-[1.01]">
+                        <div class="text-2xl bg-gray-100 p-2 rounded-full w-10 h-10 flex items-center justify-center">老</div>
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-xs text-gray-700">気の利かないベテラン僧</span>
+                                <span class="text-[10px] text-gray-400">平安時8:50</span>
+                            </div>
+                            <p class="text-xs font-bold text-gray-600 mt-1">「あ、児ちゃんもう寝てるわ。起こしたら悪いからそのまま寝かせといてあげよう。お餅は我々だけで…」</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex gap-3 transition-transform hover:scale-[1.01]">
+                        <div class="text-2xl bg-pink-100 p-2 rounded-full w-10 h-10 flex items-center justify-center">児</div>
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-xs text-pink-600">そら寝中の児</span>
+                                <span class="text-[10px] text-gray-400">平安時8:52</span>
+                            </div>
+                            <p class="text-xs font-bold text-red-600 mt-1">「あなうれし（ああっ、お餅が…！）\n『はい！！（かいッ！）』」</p>
+                            <span class="text-[9px] text-gray-400 mt-2 block"><i class="fa-solid fa-fire text-orange-400"></i> 「遅すぎるお返事」が爆笑を呼んで拡散中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 絵仏師良秀＆伴大納言エリア -->
+            <div id="story-yoshihide-box" class="flex flex-col gap-4 hidden">
+                <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-emerald-100 flex flex-col gap-4">
+                    <div>
+                        <span class="bg-red-100 text-red-800 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-fire mr-1"></i>宇治拾遺物語：絵仏師良秀</span>
+                        <h4 class="text-lg font-black text-gray-800 mt-3">火事で自宅が燃えるのを喜ぶ、特異な絵師</h4>
+                        <p class="text-xs text-gray-500 mt-2 leading-relaxed">
+                            自宅が火事になり、自分の妻子や衣服が逃げ遅れているのにもかかわらず、良秀はただ燃え盛る火炎を見つめて「なんと素晴らしい。私はこれまで不動明王の火の描き方が下手だった。これでようやく極意が分かった！」と大笑いします。
+                            芸術を極めるために全てを犠牲にする「芸術至上主義」の姿を描いており、後に**芥川龍之介**がこの話を基に名作**『地獄変』**を執筆しました。
+                        </p>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-scroll mr-1"></i>伴大納言絵巻（国宝）</span>
+                        <h4 class="text-lg font-black text-gray-800 mt-3">平安時代の「拡散（バズ）」と絵巻</h4>
+                        <p class="text-xs text-gray-500 mt-2 leading-relaxed">
+                            国宝「伴大納言絵巻」には、応天門の変（放火事件）を巡って、都の人々が噂話に大騒ぎする姿が生き生きと描かれています。
+                            マスコミやSNSのなかった当時でも、事件の真犯人は現場を目撃した人の**噂話（拡散力）**から暴かれました。説話の多くは、こうした人々の強い関心や噂話から生まれたものが多いのです。
+                        </p>
+                    </div>
+
+                    <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-200 flex items-center gap-3">
+                        <span class="text-3xl">🎨</span>
+                        <div>
+                            <h5 class="text-xs font-black text-emerald-900">みやびちゃんのコラム</h5>
+                            <p class="text-[11px] text-emerald-800 font-bold mt-1">「今も昔も、人の噂話の拡散力は同じでおじゃるな。説話を読むことで、その時代の人々が何に注目し、何を楽しんでいたのかが見えてくるのでおじゃる！」</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== SCREEN: INSTRUCTIONS (遊び方) ==================== -->
+    <div id="modal-instructions" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border-4 border-sakuraDark flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b-2 border-sakura pb-2">
+                <h3 class="text-lg font-black text-pink-600 flex items-center gap-1.5"><i class="fa-solid fa-circle-question"></i> コトノハの小径の遊び方</h3>
+                <button onclick="closeInstructions()" class="text-gray-400 hover:text-gray-600 font-extrabold text-lg">×</button>
+            </div>
+
+            <div class="flex flex-col gap-3 text-xs md:text-sm font-bold text-gray-600 leading-relaxed">
+                <p>このツールは、高校古文の入門単元「古文に親しむ」を楽しく体験するゲームでおじゃる！</p>
+                
+                <div class="bg-pink-50 p-3 rounded-xl border border-pink-100 flex flex-col gap-1">
+                    <span class="font-black text-pink-700">🍡 各ステージをクリアして経験値を貯めよう</span>
+                    <span>正解すると経験値（pt）を獲得できるぞ！100pt貯まると「お庭レベル」が上がり、あなたの庵の周りに桜が満開になったり、蛍が飛んだり、行く河が流れたりしてどんどん雅（みやび）になるでおじゃる！</span>
+                </div>
+
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 flex flex-col gap-1">
+                    <span class="font-black text-amber-800">📖 収録コンテンツについて</span>
+                    <span>・竹取物語や枕草子、平家物語、徒然草などの有名フレーズをすべてカバー。</span>
+                    <span>・歴史的仮名遣いの読み方変換。</span>
+                    <span>・文法（係り結びと「ば」の条件識別）。</span>
+                    <span>・児のそら寝や伴大納言絵巻の背景知識。</span>
+                </div>
+
+                <p class="text-center text-pink-600 font-black mt-2">さあ、麻呂と一緒にみやびな世界へ参ろう！</p>
+            </div>
+
+            <button onclick="closeInstructions()" class="bg-pink-500 hover:bg-pink-600 text-white font-black py-2.5 rounded-xl text-xs shadow transition-transform active:scale-95">
+                おじゃる！（ゲームを始める）
+            </button>
+        </div>
+    </div>
+
+    <!-- フッター -->
+    <footer class="bg-white py-4 border-t border-gray-100 z-20">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="text-[10px] text-gray-400 font-bold">© 2026 コトノハの小径 〜みやびちゃんと学ぶ古文入門〜</p>
+            <p class="text-[9px] text-gray-300 mt-0.5">高等学校国語科「古文に親しむ」対応デジタル教材</p>
+        </div>
+    </footer>
+
+    <!-- JSゲームスクリプト -->
+    <script>
+        // --- Web Audio API を使った和風オリジナル効果音シンセサイザー ---
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // 琴・鈴を模した「正解」キラキラ音
+        function playKotoSuccess() {
+            initAudio();
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            
+            // 3つの音を時間差で鳴らして分散和音（アルペジオ）にする
+            const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            freqs.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.type = 'triangle'; // 柔らかい琴に近い音
+                osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                
+                gainNode.gain.setValueAtTime(0.2, now + idx * 0.08);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.6);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start(now + idx * 0.08);
+                osc.stop(now + idx * 0.08 + 0.8);
+            });
+        }
+
+        // 小鼓（ぽんっ）を模した「不正解・和風リセット」音
+        function playTsuzumiFail() {
+            initAudio();
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            // 音程が急激に上がる鼓のピッチ変化をエミュレート
+            osc.frequency.setValueAtTime(120, now);
+            osc.frequency.exponentialRampToValueAtTime(280, now + 0.15);
+            
+            gainNode.gain.setValueAtTime(0.4, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start(now);
+            osc.stop(now + 0.35);
+        }
+
+        // 軽いカチッという選択音（拍子木を小さく鳴らした感じ）
+        function playClickSound() {
+            initAudio();
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(1500, now);
+            
+            gainNode.gain.setValueAtTime(0.15, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start(now);
+            osc.stop(now + 0.06);
+        }
+
+        // --- ゲーム状態管理システム ---
+        const gameState = {
+            exp: 0,
+            level: 1,
+            completedRhythm: [], // クリアした音読パズル
+            currentScreen: 'home'
+        };
+
+        // ローカルストレージからの読み込み
+        function loadSaveData() {
+            const saved = localStorage.getItem('kotoha_garden_save');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    gameState.exp = data.exp || 0;
+                    gameState.level = data.level || 1;
+                    gameState.completedRhythm = data.completedRhythm || [];
+                } catch(e) {
+                    console.log("No save file detected, setting to default.");
+                }
+            }
+            updateGardenUI();
+        }
+
+        function saveGame() {
+            localStorage.setItem('kotoha_garden_save', JSON.stringify(gameState));
+        }
+
+        // 経験値獲得とレベルアップ
+        function earnExp(amount) {
+            gameState.exp += amount;
+            if (gameState.exp >= 100) {
+                gameState.level += 1;
+                gameState.exp = gameState.exp % 100;
+                // レベルアップお祝い効果音
+                setTimeout(playKotoSuccess, 100);
+                setTimeout(playKotoSuccess, 300);
+                miyabiSay(`おめでとうでおじゃる！レベルアップして【お庭Lv.${gameState.level}】になったぞ！庭がもっと雅（みやび）になったでおじゃる！🌸✨`);
+                triggerCherryBlossomShower();
+            } else {
+                playKotoSuccess();
+            }
+            updateGardenUI();
+            saveGame();
+        }
+
+        // 庭のUIとグラフィックの更新
+        function updateGardenUI() {
+            document.getElementById('garden-level').innerText = gameState.level;
+            document.getElementById('garden-exp').innerText = `${gameState.exp}/100pt`;
+            
+            // お庭ステータス文と言の葉の桜
+            const statusText = document.getElementById('garden-status-text');
+            const treeEmoji = document.getElementById('tree-emoji');
+            const firefly = document.getElementById('garden-firefly');
+            const boat = document.getElementById('garden-boat');
+
+            if (gameState.level === 1) {
+                statusText.innerText = '桜が少し咲いているぞ！';
+                treeEmoji.innerText = '🌸';
+                firefly.style.display = 'none';
+                boat.style.display = 'none';
+            } else if (gameState.level === 2) {
+                statusText.innerText = '桜が満開でおじゃる！🌸';
+                treeEmoji.innerText = '🌳🌸';
+                firefly.style.display = 'flex';
+                boat.style.display = 'none';
+            } else {
+                statusText.innerText = '蛍も河も現れて完璧に雅なり！✨🏞️';
+                treeEmoji.innerText = '🌳🌸✨';
+                firefly.style.display = 'flex';
+                boat.style.display = 'flex';
+            }
+        }
+
+        // 桜吹雪を一時的に大量に降らせるエフェクト
+        function triggerCherryBlossomShower() {
+            const container = document.getElementById('sakura-container');
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const petal = document.createElement('div');
+                    petal.classList.add('cherry-blossom');
+                    petal.style.left = Math.random() * 100 + 'vw';
+                    petal.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    petal.style.width = Math.random() * 12 + 8 + 'px';
+                    petal.style.height = Math.random() * 12 + 8 + 'px';
+                    container.appendChild(petal);
+                    setTimeout(() => petal.remove(), 6000);
+                }, i * 100);
+            }
+        }
+
+        // みやびちゃんアドバイザーのセリフ更新
+        function miyabiSay(text) {
+            const bubble = document.getElementById('miyabi-bubble');
+            bubble.innerText = text;
+            // みやびちゃん口パク＆ジャンプ風アニメーション
+            const svg = document.getElementById('miyabi-svg');
+            svg.classList.add('bounce-custom');
+            setTimeout(() => {
+                svg.classList.remove('bounce-custom');
+            }, 1500);
+        }
+
+        // 画面の切り替え
+        function showScreen(screenId) {
+            playClickSound();
+            document.querySelectorAll('.screen-view').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+            gameState.currentScreen = screenId;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 画面遷移に合わせたみやびちゃんの助言
+            if (screenId === 'home') {
+                miyabiSay('次はどの道へ進むか？あなたの進みたい道を選ぶのじゃ！');
+            } else if (screenId === 'kanazukai') {
+                initKanaGame();
+                miyabiSay('歴史的仮名遣いの読み方の修行でおじゃる！「はひふへほ」や「わゐゑを」に注意するのじゃぞ。');
+            } else if (screenId === 'rhythm') {
+                initRhythmPuzzle();
+                miyabiSay('美しい古典の冒頭をパズルで並び替えるでおじゃる。完成させると現代語訳と麻呂の解説が読めるようになるぞ！');
+            } else if (screenId === 'grammar') {
+                initGrammarGame();
+                miyabiSay('文法の修行でおじゃる！係り結びペアと、接続の「ば」をしっかりと仕分けるのじゃ！');
+            } else if (screenId === 'story') {
+                miyabiSay('おはなし絵巻でおじゃる！児のそら寝を平安京のSNS風に再現したぞ。右のタブで絵仏師良秀や絵巻の解説も見られるぞ。');
+            }
+        }
+
+        // ==================== データベースエリア ====================
+
+        // 1. 歴史的仮名遣いクイズデータベース
+        const KANAZUKAI_QUESTIONS = [
+            {
+                source: "竹取物語",
+                question: "いふ",
+                sentence: "「さぬきのみやつこといふものありけり」",
+                options: ["いふ", "いう", "いぶ", "ゆう"],
+                answer: "いう",
+                hint: "「はひふへほ」は、言葉の最初以外では「わいうえお」と発音する法則があるぞ！",
+                exp: "「いふ」は現代語の「言う」にあたるので「いう」と発音するでおじゃる。"
+            },
+            {
+                source: "竹取物語",
+                question: "うつくしう",
+                sentence: "「いとうつくしうてゐたり」",
+                options: ["うつくしゅう", "うつくしく", "うつくしう", "うつくしよう"],
+                answer: "うつくしゅう",
+                hint: "「～しく」に「て」が接続して「～しう」とウ音便化しておる。「しう」は「しゅう」と発音するのじゃ！",
+                exp: "「うつくしうて」は「かわいらしい様子で」という意味でおじゃる。現代語の「美しい」より当時は「かわいい」という意味が強かったのじゃぞ！"
+            },
+            {
+                source: "枕草子",
+                question: "やうやう",
+                sentence: "「やうやう白くなりゆく山際」",
+                options: ["やうやう", "ようよう", "よよ", "やうよ"],
+                answer: "ようよう",
+                hint: "「あう」は「おう」と発音するのがルールでおじゃる。つまり「や（あ）う」は「よ（お）う」になるぞ！",
+                exp: "「やうやう」は現代語の「だんだんと、次第に」という意味でおじゃる。"
+            },
+            {
+                source: "源氏物語",
+                question: "にようご、かうい",
+                sentence: "「女御、更衣あまた候ひける中に」",
+                options: ["にょご、こうい", "にようご、こうい", "にょご、かうい", "にょうご、かうい"],
+                answer: "にょご、こうい",
+                hint: "「によう」は「にょ」と短くなり、「かう」は「こう」と発音するのじゃぞ！",
+                exp: "「女御（にょご）」「更衣（こうい）」は帝の妃たちの身分の名前でおじゃる。たくさんのお妃が仕えていたのじゃな。"
+            },
+            {
+                source: "平家物語",
+                question: "ゐたる",
+                sentence: "「つひには滅びぬる者も、また風の前の塵におなじ。」\n※類題：うつくしうて「ゐたり」",
+                options: ["うぃたる", "いる", "いたる", "ゐたる"],
+                answer: "いたる",
+                hint: "「ゐ（ヰ）」は現代語の「い」と発音するルールでおじゃる！",
+                exp: "「ゐる」は「座っている」「存在する」という意味でおじゃる。「うつくしうてゐたり」は「かわいらしい様子で座っている」になるのじゃ！"
+            },
+            {
+                source: "奥の細道",
+                question: "過客",
+                sentence: "「月日は百代の過客にして」",
+                options: ["さかきゃく", "かかく (くわかく)", "よぎるひと", "かきゃく"],
+                answer: "かかく (くわかく)",
+                hint: "芭蕉さんのこの名文は「くわかく」と漢音で読むのが通説でおじゃる！",
+                exp: "「過客（かかく / くわかく）」は「旅人」という意味。月日を旅人になぞらえた李白の詩が元ネタでおじゃる！"
+            },
+            {
+                source: "児のそら寝",
+                question: "さぶらひ",
+                sentence: "「そこの御前にさぶらひける若き法師」",
+                options: ["さぶらい", "さぶらび", "さむらい", "さぶらひ"],
+                answer: "さぶらい",
+                hint: "言葉の最初（語頭）以外の「ひ」は「い」と発音するのじゃ！",
+                exp: "「さぶらふ」は「お仕えする」という意味の謙譲語でおじゃる！発音は「さぶらい」じゃな。武士を意味する『さむらい』の語源でもあるぞ。"
+            },
+            {
+                source: "平家物語",
+                question: "こゑ",
+                sentence: "「祇園精舎の鐘の声」",
+                options: ["こえ", "こゑ", "こえい", "こうぇ"],
+                answer: "こえ",
+                hint: "「ゑ（ヱ）」は、現代の「え」と同じ発音にするのが歴史的仮名遣いのルールじゃ！",
+                exp: "「こゑ」は現代の「声」でおじゃる。ヱビスビールの「ヱ」と同じ文字じゃが、発音は「え」とシンプルに発音するのじゃ。"
+            },
+            {
+                source: "伊勢物語",
+                question: "けふ",
+                sentence: "「けふは、うつくしき桜をこそ見め」",
+                options: ["きょう", "けふ", "けう", "きよふ"],
+                answer: "きょう",
+                hint: "「えふ」は「よう」に変化するぞ！「け（え）ふ」は「きょ（よ）う」になるのじゃ！",
+                exp: "「けふ」は「今日（きょう）」のこと。同様に「てふてふ」は「ちょうちょう」になるなど、「えふ」の長音化ルールは超重要じゃぞ！"
+            },
+            {
+                source: "徒然草",
+                question: "せうそこ",
+                sentence: "「ある人、せうそこを送りて…」",
+                options: ["しょうそこ", "せいそこ", "しょうそく", "せうそく"],
+                answer: "しょうそこ",
+                hint: "「えう」は「よう」と発音するぞ！「せ（え）う」は「しょ（よ）う」じゃな。",
+                exp: "「せうそこ（消息）」は、手紙や安否の知らせ、または訪問時の取り次ぎを頼むことを意味する古語でおじゃる。発音は「しょうそこ」じゃ！"
+            },
+            {
+                source: "方丈記",
+                question: "あらはす",
+                sentence: "「盛者必衰のことわりをあらはす」",
+                options: ["あらわす", "あらはす", "あらはず", "あらわず"],
+                answer: "あらわす",
+                hint: "語頭（最初）以外の「は」は「わ」と発音するルールじゃぞ！",
+                exp: "「あらはす（表す・現す）」は、はっきりと表に出して示すこと。「は」が語中にあるので「わ」と読むでおじゃる。"
+            },
+            {
+                source: "児のそら寝",
+                question: "いらへむ",
+                sentence: "「いま一度呼ばれていらへむとて」",
+                options: ["いらえん", "いらへむ", "いらえむ", "いらへん"],
+                answer: "いらえん",
+                hint: "「へ」は「え」に、「む」は「ん」に変化するダブル変化じゃ！",
+                exp: "「いらへむ」は「返事をしよう」という意味でおじゃる。発音は「いらえん」となるのが歴史的仮名遣いの決まりじゃな。"
+            }
+        ];
+
+        // 2. 言の葉パズルデータベース
+        const RHYTHM_WORKS = {
+            taketori: {
+                title: "『竹取物語』冒頭",
+                source: "竹取物語",
+                roman: "Taketori Monogatari",
+                correct: ["今は昔、", "竹取の翁と", "いふもの", "ありけり。"],
+                scrambled: ["いふもの", "今は昔、", "ありけり。", "竹取の翁と"],
+                translation: "今となっては昔のことだが、竹取の翁という者がいたということだ。",
+                column: "「今は昔」は物語の王道書き出しでおじゃる！「けり」は「～だったそうだ」という伝聞・過去を表す助動詞で、不思議な世界に一気に引き込む効果があるのじゃ。"
+            },
+            makura: {
+                title: "『枕草子』春のあけぼの",
+                source: "枕草子",
+                roman: "Makura no Sosho",
+                correct: ["春は、", "あけぼの。", "やうやう", "白くなりゆく", "山際、"],
+                scrambled: ["山際、", "やうやう", "あけぼの。", "白くなりゆく", "春は、"],
+                translation: "春は明け方が素晴らしい。だんだんと白くなっていく山際が、少し明るくなって...",
+                column: "清少納言さんの不朽の随筆でおじゃる。「春はあけぼの（が良い）」のように、「いとをかし（大変趣がある）」が省略されていると読むのが一般的なのじゃ！"
+            },
+            heike: {
+                title: "『平家物語』冒頭",
+                source: "平家物語",
+                roman: "Heike Monogatari",
+                correct: ["祇園精舎の", "鐘の声、", "諸行無常の", "響きあり。"],
+                scrambled: ["諸行無常の", "祇園精舎の", "響きあり。", "鐘の声、"],
+                translation: "祇園精舎にある鐘の音には、この世のすべてのものは移り変わる（永遠ではない）という響きがある。",
+                column: "軍記物語の傑作でおじゃる！仏教の無常観（すべてのものは滅びゆく）を美しく七五調のリズムで表現した、極めて音楽的な冒頭でおじゃるな。"
+            },
+            tsurezure: {
+                title: "『徒然草』冒頭",
+                source: "徒然草",
+                roman: "Tsurezuregusa",
+                correct: ["つれづれなる", "ままに、", "日暮らし、", "硯にむかひて"],
+                scrambled: ["硯にむかひて", "つれづれなる", "日暮らし、", "ままに、"],
+                translation: "特にすることもなく手持ちぶさたなのにまかせて、一日中、硯に向かって...",
+                column: "兼好法師（吉田兼好）による随筆でおじゃる。「つれづれなり」は「することがなく寂しい、退屈だ」という意味で、そんな時間に心に浮かんだとりとめもない事を書き写したのが本作なのじゃ。"
+            },
+            okuno: {
+                title: "『奥の細道』冒頭",
+                source: "奥の細道",
+                roman: "Oku no Hosomichi",
+                correct: ["月日は", "百代の", "過客にして、", "行きかふ年も", "また旅人なり。"],
+                scrambled: ["過客にして、", "月日は", "また旅人なり。", "百代の", "行きかふ年も"],
+                translation: "月日は永遠に旅を続ける旅人のようなものであり、去ってはやってくる年もまた、同じく旅人である。",
+                column: "松尾芭蕉さんによる、江戸時代の紀行文でおじゃる！旅を人生そのものと捉えた、極めて詩的な表現で始まる最高傑作なのじゃ。"
+            }
+        };
+
+        // 3. 係り結びクイズデータ
+        const KAKARI_DATA = {
+            left: [
+                { id: "zo", text: "ぞ（強意）", match: "rentai" },
+                { id: "namu", text: "なむ（強意）", match: "rentai" },
+                { id: "ya", text: "や（疑問・反語）", match: "rentai" },
+                { id: "ka", text: "か（疑問・反語）", match: "rentai" },
+                { id: "koso", text: "こそ（強意）", match: "izen" }
+            ],
+            right: [
+                { id: "rentai", text: "連体形（れんたいけい）" },
+                { id: "izen", text: "已然形（いぜんけい）" }
+            ]
+        };
+
+        // 4. 「ば」の識別クイズデータ
+        const BA_QUESTIONS = [
+            {
+                source: "児のそら寝",
+                phrase: "かいなぐらむとて、おどろかさ<span class='text-red-500 underline'>ば</span>、",
+                kana: "「（児が）お餅をかき集めようとして寝ているので、彼を起こした【ならば】...」",
+                type: "katei", // 仮定
+                parent: "未然形（おどろかさ） ＋ ば",
+                exp: "「おどろかす（起こす）」の未然形「おどろかさ」に「ば」がついているので、仮定条件「もし起こした【ならば】」と訳すでおじゃる！"
+            },
+            {
+                source: "児のそら寝",
+                phrase: "（呼びかけを）一度にいらへむも待ちけるかともぞ思ふとて、寝たるほどに、いま一度呼ばれていらへむとて、念じて寝たるほどに、さらに（その後は）呼ばざりけれ<span class='text-red-500 underline'>ば</span>、",
+                kana: "「（早く返事をすると待ち構えていたと思われるので）しばらく耐えて寝ていたところ、全く呼ばれなくなってしまった【ので（焦った）】...」",
+                type: "kakutei", // 確定（〜ので）
+                parent: "已然形（呼ばざりけれ） ＋ ば",
+                exp: "「ず（打消し）」の已然形である「けれ」に「ば」が接続しているため、確定条件「呼ばれなかった【ので / ところ】」となるのじゃ！"
+            },
+            {
+                source: "徒然草",
+                phrase: "硯にむかひて、心にうつりゆくよしなしごとを、そこはかとなく書きつくれ<span class='text-red-500 underline'>ば</span>、",
+                kana: "「心に浮かぶたわいもないことを、なんとなく書きつけていく【と / 書きつけたところ】、」",
+                type: "kakutei", // 確定（〜と、〜ところ）
+                parent: "已然形（書きつくれ） ＋ ば",
+                exp: "「書きつく（下二段）」の已然形「書きつくれ」に「ば」がついているので、確定条件「書きつける【と】、書きつけた【ところ】」になるでおじゃる！"
+            },
+            {
+                source: "今鏡（用光と白波）",
+                phrase: "波風おさまら<span class='text-red-500 underline'>ば</span>、",
+                kana: "「もし、この荒れ狂う波風が静まった【ならば】、」",
+                type: "katei", // 仮定
+                parent: "未然形（おさまら） ＋ ば",
+                exp: "「おさまる（四段）」の未然形「おさまら」＋「ば」の形じゃ。仮定の条件「波風が静まった【ならば】」と訳すのが正解でおじゃる！"
+            },
+            {
+                source: "宇治拾遺物語",
+                phrase: "（人の言ふことを）聞きつれ<span class='text-red-500 underline'>ば</span>、",
+                kana: "「（人の言うことを）聞いた【ところ / 聞いたので】、」",
+                type: "kakutei", // 確定
+                parent: "已然形（聞きつれ） ＋ ば",
+                exp: "「聞きつ（完了の助動詞『つ』）」の已然形である「つれ」に「ば」が接続しているため、確定条件「聞いた【ところ / 聞いたので】」と訳すのじゃ！"
+            },
+            {
+                source: "竹取物語",
+                phrase: "（もし）風吹か<span class='text-red-500 underline'>ば</span>、",
+                kana: "「もし、（強い）風が吹いた【ならば】、」",
+                type: "katei", // 仮定
+                parent: "未然形（吹か） ＋ ば",
+                exp: "「吹く（四段）」の未然形である「吹か」に「ば」が接続しているため、仮定条件「もし風が吹いた【ならば】」と訳すのが大正解でおじゃる！"
+            }
+        ];
+
+
+        // ==================== 1. 歴史的仮名遣いゲームの実装 ====================
+        let currentKanaIndex = 0;
+
+        function initKanaGame() {
+            currentKanaIndex = 0;
+            showKanaQuestion();
+            document.getElementById('kana-feedback-box').classList.add('hidden');
+        }
+
+        function showKanaQuestion() {
+            const q = KANAZUKAI_QUESTIONS[currentKanaIndex];
+            document.getElementById('kana-q-index').innerText = currentKanaIndex + 1;
+            document.getElementById('kana-q-total').innerText = KANAZUKAI_QUESTIONS.length;
+            document.getElementById('kana-source').innerText = q.source;
+            document.getElementById('kana-question').innerText = q.question;
+            document.getElementById('kana-sentence').innerHTML = q.sentence;
+            
+            // 選択肢ボタンの生成
+            const optionsContainer = document.getElementById('kana-options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-pink-100 hover:bg-pink-200 text-pink-900 font-extrabold py-3 px-4 rounded-2xl text-sm border-b-4 border-pink-300 transition-all active:scale-95 text-center shadow-sm";
+                btn.innerText = opt;
+                btn.onclick = () => checkKanaAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('kana-feedback-box').classList.add('hidden');
+        }
+
+        function triggerKanaHint() {
+            playClickSound();
+            const q = KANAZUKAI_QUESTIONS[currentKanaIndex];
+            miyabiSay(`この問題のヒント： ${q.hint}`);
+        }
+
+        function checkKanaAnswer(selected) {
+            const q = KANAZUKAI_QUESTIONS[currentKanaIndex];
+            const feedbackBox = document.getElementById('kana-feedback-box');
+            const statusIcon = document.getElementById('kana-status-icon');
+            const feedbackTitle = document.getElementById('kana-feedback-title');
+            const explanation = document.getElementById('kana-explanation');
+            const nextBtn = document.getElementById('kana-next-btn');
+
+            feedbackBox.classList.remove('hidden');
+            feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            if (selected === q.answer) {
+                // 正解
+                statusIcon.innerText = "🌸";
+                feedbackTitle.innerText = "正解でおじゃる！";
+                feedbackTitle.className = "font-black text-lg text-green-700";
+                explanation.innerText = q.exp;
+                miyabiSay("見事でおじゃる！素晴らしい古文のセンスを持っているな！");
+                earnExp(15);
+            } else {
+                // 不正解
+                playTsuzumiFail();
+                statusIcon.innerText = "😢";
+                feedbackTitle.innerText = "おやおや、違っておじゃる...";
+                feedbackTitle.className = "font-black text-lg text-red-600";
+                explanation.innerText = `正解は「${q.answer}」でおじゃる。${q.exp}`;
+                miyabiSay("あきらめずに、もう一度解説をよく読んで覚えるのじゃぞ。");
+            }
+
+            // 最終問題の場合はボタンの文言を変更
+            if (currentKanaIndex === KANAZUKAI_QUESTIONS.length - 1) {
+                nextBtn.innerHTML = `すべての仮名遣いをクリア！ <i class="fa-solid fa-trophy ml-1"></i>`;
+            } else {
+                nextBtn.innerHTML = `次の問題へ進む <i class="fa-solid fa-arrow-right ml-1"></i>`;
+            }
+        }
+
+        function nextKanaQuestion() {
+            playClickSound();
+            if (currentKanaIndex < KANAZUKAI_QUESTIONS.length - 1) {
+                currentKanaIndex++;
+                showKanaQuestion();
+            } else {
+                // ホーム画面へ戻る、お庭にお花プレゼント
+                miyabiSay("あっぱれ！歴史的仮名遣いの基礎はバッチリ習得したぞ。お庭に少し桜をプラスしたでおじゃる！");
+                earnExp(20);
+                showScreen('home');
+            }
+        }
+
+
+        // ==================== 2. 言の葉パズル（音読・冒頭選）の実装 ====================
+        let currentRhythmKey = 'taketori';
+        let rhythmHand = [];
+        let rhythmAssembled = [];
+
+        function selectRhythmWork(workKey) {
+            playClickSound();
+            currentRhythmKey = workKey;
+            
+            // タブのアクティブ表示変更
+            document.querySelectorAll('.rhythm-tab-btn').forEach(btn => {
+                btn.className = "rhythm-tab-btn bg-gray-100 text-gray-600 font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all";
+            });
+            const activeTab = document.getElementById(`tab-${workKey}`);
+            if (activeTab) {
+                activeTab.className = "rhythm-tab-btn bg-amber-500 text-white font-black text-xs px-3.5 py-2 rounded-xl shadow-sm transition-all";
+            }
+
+            initRhythmPuzzle();
+        }
+
+        function initRhythmPuzzle() {
+            const data = RHYTHM_WORKS[currentRhythmKey];
+            document.getElementById('rhythm-title').innerText = `『${data.source}』の冒頭を完成させよう！`;
+            
+            // 手元ワードと組み立てワードの初期化
+            rhythmHand = [...data.scrambled];
+            rhythmAssembled = [];
+
+            renderRhythmPuzzle();
+            document.getElementById('rhythm-success-box').classList.add('hidden');
+        }
+
+        function renderRhythmPuzzle() {
+            const handContainer = document.getElementById('rhythm-hand');
+            const assembledContainer = document.getElementById('rhythm-assembled');
+
+            handContainer.innerHTML = '';
+            assembledContainer.innerHTML = '';
+
+            // 手元のカード描画
+            rhythmHand.forEach((word, index) => {
+                const card = document.createElement('button');
+                card.className = "bg-white hover:bg-amber-50 text-gray-800 font-black text-xs md:text-sm p-3 rounded-xl border-2 border-amber-200 hover:border-amber-400 shadow-sm transition-all transform active:scale-95";
+                card.innerText = word;
+                card.onclick = () => moveCardToAssembled(index);
+                handContainer.appendChild(card);
+            });
+
+            // 組み立てエリアの描画
+            if (rhythmAssembled.length === 0) {
+                assembledContainer.innerHTML = `<span class="text-xs font-bold text-gray-400">下に並ぶカードをタップして、ここに並べていくでおじゃる</span>`;
+            } else {
+                rhythmAssembled.forEach((word, index) => {
+                    const card = document.createElement('button');
+                    card.className = "bg-amber-100 hover:bg-red-50 text-amber-900 font-black text-xs md:text-sm p-3 rounded-xl border-2 border-amber-300 hover:border-red-300 shadow-inner transition-all transform active:scale-95";
+                    card.innerText = word;
+                    card.onclick = () => moveCardToHand(index);
+                    assembledContainer.appendChild(card);
+                });
+            }
+        }
+
+        function moveCardToAssembled(index) {
+            playClickSound();
+            const word = rhythmHand.splice(index, 1)[0];
+            rhythmAssembled.push(word);
+            renderRhythmPuzzle();
+        }
+
+        function moveCardToHand(index) {
+            playClickSound();
+            const word = rhythmAssembled.splice(index, 1)[0];
+            rhythmHand.push(word);
+            renderRhythmPuzzle();
+        }
+
+        function resetRhythmPuzzle() {
+            playClickSound();
+            initRhythmPuzzle();
+        }
+
+        function checkRhythmAnswer() {
+            const data = RHYTHM_WORKS[currentRhythmKey];
+            const successBox = document.getElementById('rhythm-success-box');
+            
+            // 一致判定
+            const isCorrect = JSON.stringify(rhythmAssembled) === JSON.stringify(data.correct);
+
+            if (isCorrect) {
+                successBox.classList.remove('hidden');
+                successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                document.getElementById('rhythm-roman').innerText = data.roman;
+                document.getElementById('rhythm-translation').innerText = data.translation;
+                document.getElementById('rhythm-column').innerText = data.column;
+
+                miyabiSay(`実に見事でおじゃる！『${data.source}』の美しい響きとリズムを、現代語訳とともにじっくり味わうのじゃ！`);
+                
+                // 初回クリアかどうかにかかわらず学習報酬
+                earnExp(25);
+            } else {
+                playTsuzumiFail();
+                miyabiSay("うぬぬ、どこか順番がおかしいようでおじゃる。もう一度見直すか、リセットして挑戦のじゃ！");
+            }
+        }
+
+
+        // ==================== 3. 文法ゲームの実装（係り結び ＆ ば） ====================
+        let selectedKakariLeft = null;
+        let selectedKakariRight = null;
+        let baIndex = 0;
+        let baScore = 0;
+
+        function initGrammarGame() {
+            switchGrammarMode('kakari');
+        }
+
+        function switchGrammarMode(mode) {
+            playClickSound();
+            document.getElementById('btn-gmode-kakari').className = "bg-gray-100 text-gray-600 font-extrabold text-xs py-2 rounded-xl transition-all";
+            document.getElementById('btn-gmode-ba').className = "bg-gray-100 text-gray-600 font-extrabold text-xs py-2 rounded-xl transition-all";
+
+            if (mode === 'kakari') {
+                document.getElementById('btn-gmode-kakari').className = "bg-violet-500 text-white font-black text-xs py-2 rounded-xl shadow-inner transition-all";
+                document.getElementById('gbox-kakari').classList.remove('hidden');
+                document.getElementById('gbox-ba').classList.add('hidden');
+                initKakari();
+            } else {
+                document.getElementById('btn-gmode-ba').className = "bg-violet-500 text-white font-black text-xs py-2 rounded-xl shadow-inner transition-all";
+                document.getElementById('gbox-kakari').classList.add('hidden');
+                document.getElementById('gbox-ba').classList.remove('hidden');
+                initBaGame();
+            }
+        }
+
+        // --- 3-A. 係り結びゲーム ---
+        function initKakari() {
+            selectedKakariLeft = null;
+            selectedKakariRight = null;
+            renderKakari();
+            document.getElementById('kakari-match-status').innerText = "左の「係助詞」と、右の対応する「結びの活用形」をタップしてペアを作るのじゃ！";
+        }
+
+        function renderKakari() {
+            const leftCol = document.getElementById('kakari-left-col');
+            const rightCol = document.getElementById('kakari-right-col');
+
+            // タイトル・ヘッダー部分以外の既存カードを削除
+            leftCol.querySelectorAll('.kakari-item').forEach(el => el.remove());
+            rightCol.querySelectorAll('.kakari-item').forEach(el => el.remove());
+
+            // 係助詞（左）のシャッフル描画
+            KAKARI_DATA.left.forEach(item => {
+                const btn = document.createElement('button');
+                const isSelected = selectedKakariLeft && selectedKakariLeft.id === item.id;
+                btn.className = `kakari-item font-extrabold py-3.5 px-3 rounded-2xl text-xs md:text-sm border-2 text-center transition-all transform active:scale-95 ${
+                    isSelected 
+                    ? 'bg-violet-600 text-white border-violet-800 shadow-md scale-105' 
+                    : 'bg-white text-gray-700 border-violet-200 hover:border-violet-400'
+                }`;
+                btn.innerText = item.text;
+                btn.onclick = () => selectKakariLeft(item);
+                leftCol.appendChild(btn);
+            });
+
+            // 結び（右）の描画
+            KAKARI_DATA.right.forEach(item => {
+                const btn = document.createElement('button');
+                const isSelected = selectedKakariRight && selectedKakariRight.id === item.id;
+                btn.className = `kakari-item font-extrabold py-5 px-3 rounded-2xl text-xs md:text-sm border-2 text-center transition-all transform active:scale-95 ${
+                    isSelected 
+                    ? 'bg-violet-600 text-white border-violet-800 shadow-md scale-105' 
+                    : 'bg-white text-gray-700 border-violet-200 hover:border-violet-400'
+                }`;
+                btn.innerText = item.text;
+                btn.onclick = () => selectKakariRight(item);
+                rightCol.appendChild(btn);
+            });
+        }
+
+        function selectKakariLeft(item) {
+            playClickSound();
+            selectedKakariLeft = item;
+            renderKakari();
+            checkKakariMatch();
+        }
+
+        function selectKakariRight(item) {
+            playClickSound();
+            selectedKakariRight = item;
+            renderKakari();
+            checkKakariMatch();
+        }
+
+        function checkKakariMatch() {
+            if (selectedKakariLeft && selectedKakariRight) {
+                const statusText = document.getElementById('kakari-match-status');
+                
+                if (selectedKakariLeft.match === selectedKakariRight.id) {
+                    // 正解
+                    statusText.innerText = `見事！【${selectedKakariLeft.text}】は【${selectedKakariRight.text}】に結びつくでおじゃる！🌸`;
+                    statusText.className = "text-xs font-extrabold text-green-700 bg-green-50 p-2 rounded-xl border border-green-200";
+                    miyabiSay(`「${selectedKakariLeft.text.charAt(0)}」は、結びが「${selectedKakariRight.text}」になる！大正解でおじゃる！`);
+                    earnExp(15);
+                } else {
+                    // 不正解
+                    playTsuzumiFail();
+                    statusText.innerText = `おやおや、結び方が間違っておじゃる。もう一度確かめての。`;
+                    statusText.className = "text-xs font-extrabold text-red-600 bg-red-50 p-2 rounded-xl border border-red-200";
+                    miyabiSay("係り結びにはルールがあるのじゃ。「こそ」だけは已然形（已むを得ず已然、と覚えるのじゃ！）、他は連体形じゃぞ！");
+                }
+
+                // リセット
+                selectedKakariLeft = null;
+                selectedKakariRight = null;
+                setTimeout(renderKakari, 1500);
+            }
+        }
+
+        // --- 3-B. 「ば」の識別ゲーム ---
+        function initBaGame() {
+            baIndex = 0;
+            baScore = 0;
+            document.getElementById('ba-score-current').innerText = baScore;
+            document.getElementById('ba-score-total').innerText = BA_QUESTIONS.length;
+            showBaQuestion();
+        }
+
+        function showBaQuestion() {
+            const q = BA_QUESTIONS[baIndex];
+            document.getElementById('ba-source-badge').innerText = `${q.source} より`;
+            document.getElementById('ba-target-phrase').innerHTML = q.phrase;
+            document.getElementById('ba-target-kana').innerText = q.kana;
+            document.getElementById('ba-parent-conjugation').innerText = q.parent;
+            document.getElementById('ba-feedback-toast').innerText = "さあ、どちらの「かご」に仕分ける？";
+            document.getElementById('ba-feedback-toast').className = "text-violet-800 font-extrabold bg-violet-50 px-3 py-1 rounded-lg";
+        }
+
+        function sortBaPhrase(selectedType) {
+            const q = BA_QUESTIONS[baIndex];
+            const toast = document.getElementById('ba-feedback-toast');
+
+            if (selectedType === q.type) {
+                // 正解
+                baScore++;
+                document.getElementById('ba-score-current').innerText = baScore;
+                toast.innerText = "🌸 大正解でおじゃる！";
+                toast.className = "text-green-700 font-black bg-green-50 px-3 py-1 rounded-lg border border-green-200";
+                miyabiSay(q.exp);
+                earnExp(15);
+            } else {
+                // 不正解
+                playTsuzumiFail();
+                toast.innerText = "😭 違っておじゃる...";
+                toast.className = "text-red-600 font-black bg-red-50 px-3 py-1 rounded-lg border border-red-200";
+                miyabiSay(`これは「${q.parent}」なので、${q.type === 'katei' ? '仮定条件' : '確定条件'}が正解じゃ！\n${q.exp}`);
+            }
+
+            // 1.5秒後に次の問題へ
+            setTimeout(() => {
+                if (baIndex < BA_QUESTIONS.length - 1) {
+                    baIndex++;
+                    showBaQuestion();
+                } else {
+                    miyabiSay(`すべての「ば」の識別修行が終了じゃ！正解数は【${baScore} / ${BA_QUESTIONS.length}】でおじゃった。よくがんばったの！🌸`);
+                    earnExp(20);
+                    showScreen('home');
+                }
+            }, 3000);
+        }
+
+
+        // ==================== 4. おはなし絵巻（噂話と説話）の実装 ====================
+        function switchStoryTab(tab) {
+            playClickSound();
+            document.getElementById('btn-story-chigo').className = "bg-gray-100 text-gray-600 font-extrabold text-xs py-2 rounded-xl transition-all";
+            document.getElementById('btn-story-yoshihide').className = "bg-gray-100 text-gray-600 font-extrabold text-xs py-2 rounded-xl transition-all";
+
+            if (tab === 'chigo') {
+                document.getElementById('btn-story-chigo').className = "bg-emerald-500 text-white font-black text-xs py-2 rounded-xl shadow-inner transition-all";
+                document.getElementById('story-chigo-box').classList.remove('hidden');
+                document.getElementById('story-yoshihide-box').classList.add('hidden');
+                miyabiSay('お菓子を食べたくて、お餅を焼く音をそわそわしながら寝たふりをして待つ児の姿、とても人間らしくて可愛らしいのう！');
+            } else {
+                document.getElementById('btn-story-yoshihide').className = "bg-emerald-500 text-white font-black text-xs py-2 rounded-xl shadow-inner transition-all";
+                document.getElementById('story-chigo-box').classList.add('hidden');
+                document.getElementById('story-yoshihide-box').classList.remove('hidden');
+                miyabiSay('良秀の徹底した芸術至上主義と、伴大納言絵巻に見る「昔の拡散力」の面白さを体験するのじゃ！');
+            }
+        }
+
+
+        // ==================== その他UI・モーダルコントロール ====================
+        function showInstructions() {
+            playClickSound();
+            document.getElementById('modal-instructions').classList.remove('hidden');
+        }
+
+        function closeInstructions() {
+            playClickSound();
+            document.getElementById('modal-instructions').classList.add('hidden');
+        }
+
+        // 初期化処理
+        window.onload = function() {
+            loadSaveData();
+            // 最初のアニメーション桜
+            triggerCherryBlossomShower();
+            // 自動で桜吹雪を定期的に降らせる
+            setInterval(triggerCherryBlossomShower, 20000);
+        };
+    </script>
+</body>
+</html>
